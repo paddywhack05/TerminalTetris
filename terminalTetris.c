@@ -241,6 +241,11 @@ void advanceState(int rows, int cols ,int **array,int *CordArray){
     }
     }
    findBlockCords(rows,cols,array,CordArray);
+           for(int i=6; i+1>0;i-=2){
+            array[CordArray[i]+1][CordArray[i+1]]=1;
+            array[CordArray[i]][CordArray[i+1]]=0;
+        }
+    /*
     array[CordArray[6]+1][CordArray[7]]=1;
     array[CordArray[6]][CordArray[7]]=0;
     array[CordArray[4]+1][CordArray[5]]=1;
@@ -249,6 +254,7 @@ void advanceState(int rows, int cols ,int **array,int *CordArray){
     array[CordArray[2]][CordArray[3]]=0;
     array[CordArray[0]+1][CordArray[1]]=1;
     array[CordArray[0]][CordArray[1]]=0;
+    */
                 findBlockCords(rows,cols,array,CordArray);
                 printf("debug\n");
                 printArray(CordArray);
