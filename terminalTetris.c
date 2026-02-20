@@ -213,9 +213,14 @@ int findCenter(int rows, int cols ,int **array,int *CordArray){
     int lineDiff = CordArray[6]-CordArray[0];
     int numX=0;
     int i,j;
-   for(i=0;i<4;i++){
+   for(i=6;i>0;i-=2){
+    if(numX==1){
+    numX=0;
+    }
     for(j=0;j<rows;j++){
-
+       if(array[i][j]==1){
+        numX++;
+       }
     }
 }
 }
