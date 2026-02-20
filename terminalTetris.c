@@ -2,26 +2,39 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#ifdef _WIN32
+    #include <conio.h>
+    void clearScreen(){
+    system("cls");
+    }
+#else
+#include <termios.h>
+#include <unistd.h> 
+int getch(void){
+  struct termios oldattr, newattr;
+  unsigned char ch;
+  int retcode;
+  tcgetattr(STDIN_FILENO, &oldattr);
+  newattr=oldattr;
+  newattr.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
+  retcode=read(STDIN_FILENO, &ch, 1);
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
+  return retcode<=0? EOF: (int)ch;
+}
+void clearScreen(){
+    system("clear");
+}
+#endif
 void spawnBlock(int rows, int cols ,int **array);
 void checkLines(int rows, int cols ,int **array);
 void resetGameState(int rows, int cols ,int **array){
     int i , j;
 for (i = 0; i < cols; i++) {
-    array[i] = malloc(sizeof(int)*rows);//calloc(rows,sizeof(int));malloc(sizeof(int)*rows);
+    array[i] = calloc(rows,sizeof(int));//malloc(sizeof(int)*rows);
 }
 int a,b;
-for( a=0; a < cols; a++){
-    for(b=0; b<rows;b++){
-        array[a][b] = 0;
-        //printf("%d",array[a][b]);
-       // if(array[a][b]=0){
-         //   printf(" ");
-      //  }
-       // if(b==rows-1){
-       //     printf("\n");
-       // }
-    }
-}
+
 return;
 }
 void printArray(int *arr){
@@ -33,7 +46,6 @@ void printGameState(int rows, int cols ,int **array){
     int i , j;
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
-  //  printf("%d", array[i][j]);
     if (array[i][j]==0){
         printf(".");
     } 
@@ -60,7 +72,6 @@ for( a=0; a < cols; a++){
 }
 }
 void findBlockCords(int rows, int cols ,int **array,int*CordArray){    
-    //  printArray(CordArray);
 int a,b;
 int num=0;
 for(a=0; a < cols; a++){
@@ -88,13 +99,9 @@ void setGround(int rows, int cols ,int **array,int *CordArray){
 
         findBlockCords(rows,cols,array,CordArray);
         checkLines(rows,cols,array);
-    //memset(CordArray, 0x00, 8);
     printGameState(rows,cols,array);
-    //printf("\n\n\n");
-//array[1][1] = 2;
 }
 void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
-    printf("Ground Grav\n");
     int i,j;
     int diff = listToClear[0] - listToClear[index-1];
     int startRow = listToClear[0]-diff;
@@ -104,15 +111,14 @@ void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
         array[i][j]=0;
         array[i+index][j]=2;
     }
-      //  array[listToClear[i]][j]=0;
     }
     }
 }
 void clearLines(int rows, int cols ,int **array,int *listToClear,int index){
-    printf("clear %d,%d",listToClear[index-1],index);
+    //printf("clear %d,%d",listToClear[index-1],index);
     int i,j;
     for(i=0;i<index;i++){
-        printf("cleared %d",listToClear[i]);
+        //printf("cleared %d",listToClear[i]);
   for(j=0; j<rows;j++){
     //int cordarray[listToClear[i]][j];
         //memset(,0,rows);
@@ -137,10 +143,10 @@ for (i = cols-1; i > 0; i--) {
         }
         }
          if(num==0){
-            printf("Oh shit a line: %d",i);
+           // printf("Oh shit a line: %d",i);
             linesToClear[anotherIndex]=i;
- printf("\nList el i %d\n",linesToClear[anotherIndex]);
- printf("\nList el 0 %d\n",linesToClear[0]);
+ //printf("\nList el i %d\n",linesToClear[anotherIndex]);
+ //printf("\nList el 0 %d\n",linesToClear[0]);
             anotherIndex++;
         }
         if(num == 0){
@@ -150,7 +156,7 @@ for (i = cols-1; i > 0; i--) {
     
     if(anotherIndex > 0){
           //  printf("\nList el 0\n",linesToClear[0]);
-          printf("Array before func %d\n",linesToClear[anotherIndex -1]);
+         // printf("Array before func %d\n",linesToClear[anotherIndex -1]);
         clearLines(rows,cols,array,linesToClear,anotherIndex);
     }
     return;
@@ -161,16 +167,16 @@ void moveRight(int rows, int cols ,int **array,int *CordArray){
     for(int i=7; i>1;i-=2){
            // printf("\n\ncol nums %d\nindex %d",cols,i);
            //printf("\n\n");
-           printf("Arr row:%d\nrows:%d\n",CordArray[i]+1,rows-1);
-            printf("Arr row 7:%d\nrows:%d\n",CordArray[7]+1,rows-1);
+           //printf("Arr row:%d\nrows:%d\n",CordArray[i]+1,rows-1);
+           // printf("Arr row 7:%d\nrows:%d\n",CordArray[7]+1,rows-1);
     if(CordArray[i]+1 >= rows){
 
-            printf("HIT WALL");
+           // printf("HIT WALL");
         //setGround(rows,cols,array,CordArray);
         return;
     }
         if(array[CordArray[i-1]][CordArray[i]+1] == 2){
-            printf("Wall 2 HIT");
+            //printf("Wall 2 HIT");
         //setGround(rows,cols,array,CordArray);
         return;
     }
@@ -192,12 +198,12 @@ void moveLeft(int rows, int cols ,int **array,int *CordArray){
         //    printf("Arr row 7:%d\nrows:%d\n",CordArray[7]+1,rows-1);
     if(CordArray[i+1] == 0){
 
-            printf("HIT WALL");
+            //printf("HIT WALL");
         //setGround(rows,cols,array,CordArray);
         return;
     }
         if(array[CordArray[i]][CordArray[i+1]-1] == 2){
-            printf("Wall 2 HIT");
+            //printf("Wall 2 HIT");
         //setGround(rows,cols,array,CordArray);
         return;
     }
@@ -235,12 +241,12 @@ void advanceState(int rows, int cols ,int **array,int *CordArray){
            // printf("\n\ncol nums %d\nindex %d",cols,i);
            //printf("\n\n");
     if(CordArray[i-1]+1 > cols-1){
-            printf("GROUND HIT");
+           // printf("GROUND HIT");
         setGround(rows,cols,array,CordArray);
         return;
     }
         if(array[CordArray[i-1]+1][CordArray[i]] == 2){
-            printf("GROUND 2 HIT");
+            //printf("GROUND 2 HIT");
         setGround(rows,cols,array,CordArray);
         return;
     }
@@ -250,26 +256,10 @@ void advanceState(int rows, int cols ,int **array,int *CordArray){
             array[CordArray[i]+1][CordArray[i+1]]=1;
             array[CordArray[i]][CordArray[i+1]]=0;
         }
-    /*
-    array[CordArray[6]+1][CordArray[7]]=1;
-    array[CordArray[6]][CordArray[7]]=0;
-    array[CordArray[4]+1][CordArray[5]]=1;
-    array[CordArray[4]][CordArray[5]]=0;
-    array[CordArray[2]+1][CordArray[3]]=1;
-    array[CordArray[2]][CordArray[3]]=0;
-    array[CordArray[0]+1][CordArray[1]]=1;
-    array[CordArray[0]][CordArray[1]]=0;
-    */
+
                 findBlockCords(rows,cols,array,CordArray);
-                printf("debug\n");
+                //printf("debug\n");
                 printArray(CordArray);
-/*for (unsigned i = 8 ; i-- > 0 ; )
-{
-    printf("%d",i);
-    array[(CordArray[i])][CordArray[i+1]]=0;
-    array[(CordArray[i]+1)][CordArray[i+1]]=1;
-  // do stuff with i
-}*/
 
 }
 
@@ -307,10 +297,12 @@ int main(void) {
 while (1 == 1)
 {
     char input;
+    clearScreen();//!Remove to debug
             printGameState(rows,columns,GameState);
             //checkLines(rows,columns,GameState);
-            scanf(" %c",&input);
-      //  advanceState(rows,columns,GameState,pCordArray);
+          //  scanf(" %c",&input);
+
+input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
         if(input =='d'){
             moveRight(rows,columns,GameState,pCordArray);
         } 
@@ -319,6 +311,10 @@ while (1 == 1)
         }
         if(input =='s'){
             advanceState(rows,columns,GameState,pCordArray);
+        }
+        if(input == 27){
+            printf("Quiting\n");
+            break;
         }
         if(input =='e'){
             rotateRight(rows,columns,GameState,pCordArray);
@@ -337,7 +333,7 @@ while (1 == 1)
     //Gravity(rows,columns,GameState);
         free(GameState);
      GameState = NULL;
-     printf("GAME OVER");
+    printf("GAME OVER");
     return 0;
 }
 
