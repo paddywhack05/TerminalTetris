@@ -5,9 +5,9 @@
 A = ← \
 D = → \
 S = &nbsp;↓  \
+E = ↷ \
 ESC = Exit
 
 ## Planned Controls
 
-Q = ↶ \
-E = ↷ 
+Q = ↶ 
