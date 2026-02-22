@@ -212,7 +212,6 @@ void moveRight(int rows, int cols ,int **array,int *CordArray){
 
 void moveLeft(int rows, int cols ,int **array,int *CordArray){
     for(int i=0; i<7;i+=2){
-        printf("left");
     if(CordArray[i+1] == 0){
         return;
     }
@@ -315,6 +314,12 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
 void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum){
     //int num=0;        
     printf("Appending\n");
+            int padding;
+            if(blockNum!=line && rotState == 0||rotState==2){
+                padding=-1;
+            }else{
+                padding=0;
+            }
         for(int i=0; i<7;i+=2){
         if(newCordArray[i]>=cols||newCordArray[i+1]>=rows){
             printf("too far up/right");
@@ -324,7 +329,7 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
             printf("too far left");
             return;
         }
-        if(array[newCordArray[i]][newCordArray[i+1]]==2){
+        if(array[newCordArray[i]][newCordArray[i+1]+padding]==2){
             printf("colision");
             return;
         }
@@ -332,12 +337,6 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
         for(int i=0; i<7;i+=2){
             array[CordArray[i]][CordArray[i+1]]=0;
         }
-        int padding;
-            if(blockNum!=line && rotState == 0||rotState==2){
-                padding=-1;
-            }else{
-                padding=0;
-            }
         for(int i=0; i<7;i+=2){
             printf("Y: %d X: %d\n",newCordArray[i],newCordArray[1+1]);
             array[newCordArray[i]][newCordArray[i+1]+padding]=1;
