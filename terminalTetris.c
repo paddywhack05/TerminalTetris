@@ -263,11 +263,11 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
             }
         }
         for(int i=0;i<7;i+=2){
-           int Y = CordArray[i]-Ynum;
-           int X = CordArray[i+1]-Xnum;
+           int Y = CordArray[i]-Ynum+padY;
+           int X = CordArray[i+1]-Xnum+padX;
            matrix[Y][X]=1;
         }
-        //printFixed2(matrix,3,3);
+        printFixed2(matrix,3,3);
         //Transpose
         int matrix2[3][3]={0};
 
@@ -276,8 +276,8 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
                 matrix2[i][j] = matrix[j][i];
             }
         }
-            //printf("After Transpose \n");
-           // printFixed2(matrix2,3,3);
+            printf("After Transpose \n");
+            printFixed2(matrix2,3,3);
         //Reverse
 
             for(int i=0;i<3;i++){
@@ -313,7 +313,7 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
 }
 
 void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum){
-    //int num=0;
+    //int num=0;        
     printf("Appending\n");
         for(int i=0; i<7;i+=2){
         if(newCordArray[i]>=cols||newCordArray[i+1]>=rows){
@@ -332,8 +332,15 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
         for(int i=0; i<7;i+=2){
             array[CordArray[i]][CordArray[i+1]]=0;
         }
+        int padding;
+            if(blockNum!=line && rotState == 0||rotState==2){
+                padding=-1;
+            }else{
+                padding=0;
+            }
         for(int i=0; i<7;i+=2){
-            array[newCordArray[i]][newCordArray[i+1]]=1;
+            printf("Y: %d X: %d\n",newCordArray[i],newCordArray[1+1]);
+            array[newCordArray[i]][newCordArray[i+1]+padding]=1;
         }
                     incrementRot();
             findBlockCords(rows,cols,array,CordArray);
@@ -413,17 +420,17 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         int padX;
         //printf("RotState: %d\n",rotState);
                 if(rotState==0){
-        padY = CordArray[0]-1;
-        padX = CordArray[1];
+        padY = 0;
+        padX = 0;
         }else if(rotState == 1){
-        padY = CordArray[0];
-        padX = CordArray[1]-2;
+        padY = 0;
+        padX = 0;
         }else if(rotState == 2){
-        padY = CordArray[0];
-        padX = CordArray[1];
+        padY = 0;
+        padX = 0;
         }else if(rotState == 3){
-        padY = CordArray[0];
-        padX = CordArray[1]-1;
+        padY = 0;
+        padX = 0;
         }
             Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
      
@@ -433,17 +440,17 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             int spadY;
             //printf("RotState: %d\n",rotState);
         if(rotState==0){
-        spadY = CordArray[0];
-        spadX = CordArray[1]-1;
+        spadY = 0;
+        spadX = 0;
         }else if(rotState == 1){
-        spadY = CordArray[0];
-        spadX = CordArray[1]-1;
+        spadY = 0;
+        spadX = 0;
         }else if(rotState == 2){
-        spadY = CordArray[0]-1;
-        spadX = CordArray[1]-1;
+        spadY = 0;
+        spadX = 0;
         }else if(rotState == 3){
-        spadY = CordArray[0];
-        spadX = CordArray[1];
+        spadY = 0;
+        spadX = 0;
         }
             Zrotate(rows,cols,array,CordArray,blockNum,spadX,spadY);
         break;
@@ -452,25 +459,29 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             int lpadY;
             //printf("RotState: %d\n",rotState);
         if(rotState==0){
-        lpadY = CordArray[0];
-        lpadX = CordArray[1];
+        lpadY = 0;
+        lpadX = 0;
         }else if(rotState == 1){
-        lpadY = CordArray[0];
-        lpadX = CordArray[1];
+        lpadY = 0;
+        lpadX = 0;
         }else if(rotState == 2){
-        lpadY = CordArray[0];
-        lpadX = CordArray[1];
+        lpadY = 0;
+        lpadX = 0;
         }else if(rotState == 3){
-        lpadY = CordArray[0];
-        lpadX = CordArray[1]-1;
+        lpadY = 0;
+        lpadX = 0;
         }
             Zrotate(rows,cols,array,CordArray,blockNum,lpadX,lpadY);
         break;
             case J://j
-            Zrotate(rows,cols,array,CordArray,blockNum,lpadX,lpadY);
+        int jpadY = 0;
+        int jpadX = 0;
+            Zrotate(rows,cols,array,CordArray,blockNum,jpadX,jpadY);
         break;
             case T://T
-            Zrotate(rows,cols,array,CordArray,blockNum,lpadX,lpadY);
+        int tpadY = 0;
+        int tpadX = 0;
+            Zrotate(rows,cols,array,CordArray,blockNum,tpadX,tpadY);
         break;
     }
 }
@@ -572,7 +583,7 @@ int main(void) {
 while (1 == 1)
 {
     char input;
-    //clearScreen();//!Remove to debug
+    clearScreen();//!Remove to debug
         printf("Block %d\n",currentBlock);
             printGameState(rows,columns,GameState);
             //checkLines(rows,columns,GameState);
@@ -618,7 +629,7 @@ int spawnBlock(int rows, int cols ,int **array){
     }
      int rNum = (rand() % (7 - 1 + 1)) + 1;
     //int a,b;
-   // rNum=Z;//!REMEMBER ME
+    //rNum=T;//!REMEMBER ME
     rotState = 0;
     switch (rNum)
     {
