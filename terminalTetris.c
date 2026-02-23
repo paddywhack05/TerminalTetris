@@ -35,8 +35,10 @@ enum Block{
     J,
     T,
 };
+     int nextBlock=0;
+     int currentBlock;
      int rotState;
-int spawnBlock(int rows, int cols ,int **array);
+int spawnBlock(int rows, int cols ,int **array,int num);
 void checkLines(int rows, int cols ,int **array);
 void incrementRot(){
     (rotState < 3) ? (rotState++) : (rotState=0);
@@ -75,8 +77,28 @@ void printArray(int arr[8]){
         };
     }
 }
+void printDynamic(int **arr,int rows,int cols){
+    for (int i = 0; i < cols; i++)
+    {
+        for (int j = 0; j < rows; j++){
+            printf("%d ", arr[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 void printGameState(int rows, int cols ,int **array){
     int i , j;
+    int nextBox;
+    if(nextBlock==line){
+        nextBox=4;
+    }else{
+        nextBox=3;
+    }
+    int **matrix=malloc(sizeof(int *)*nextBox);
+    resetGameState(nextBox,nextBox,matrix);
+    spawnBlock(2,nextBox,matrix,nextBlock);
+    printDynamic(matrix,nextBox,nextBox);
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
     if (array[i][j]==0){
@@ -87,6 +109,18 @@ for (i = 0; i < cols; i++) {
     }
 if (array[i][j]==2){
         printf("2");
+    }
+    if(i<2&&j==rows-1){
+        printf("\t |");
+        for(int a=0;a<nextBox;a++){
+            if (matrix[i][a]==0){
+            printf(" ");
+            }
+            if (matrix[i][a]==1){
+            printf("#");
+            }      
+            //printf("%d",matrix[i][a]);
+        }
     }
     if(j==rows-1){
         printf("\n");
@@ -119,7 +153,9 @@ for(a=0; a < cols; a++){
 }
 
 }
+
 void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum);
+
 int setGround(int rows, int cols ,int **array,int *CordArray){
     findBlockCords(rows,cols,array,CordArray);
     printf("setting ground");
@@ -129,7 +165,7 @@ int setGround(int rows, int cols ,int **array,int *CordArray){
         printf("Value:%d",array[CordArray[i]][CordArray[i+1]]);
     }
     printf("\nSETGROUND GAME ARRAY");
-   int block = spawnBlock(rows,cols,array);
+   int block = spawnBlock(rows,cols,array,0);
 
         findBlockCords(rows,cols,array,CordArray);
         checkLines(rows,cols,array);
@@ -321,11 +357,11 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
                 padding=0;
             }
         for(int i=0; i<7;i+=2){
-        if(newCordArray[i]>=cols||newCordArray[i+1]>=rows){
+        if(newCordArray[i]>=cols||newCordArray[i+1]+padding>=rows){
             printf("too far up/right");
             return;
         }
-        if(newCordArray[i+1]<0||newCordArray[i]<0){
+        if(newCordArray[i+1]+padding<0||newCordArray[i]<0){
             printf("too far left");
             return;
         }
@@ -576,13 +612,14 @@ int main(void) {
      resetGameState(rows,columns,GameState);
      int CordArray[8] ={0};
      int *pCordArray =CordArray;
-     int block = spawnBlock(rows,columns,GameState);
-     int currentBlock = block;
+     int block = spawnBlock(rows,columns,GameState,0);
+     currentBlock = block;
+     
      //int rotState;
 while (1 == 1)
 {
     char input;
-    clearScreen();//!Remove to debug
+    //clearScreen();//!Remove to debug
         printf("Block %d\n",currentBlock);
             printGameState(rows,columns,GameState);
             //checkLines(rows,columns,GameState);
@@ -621,12 +658,33 @@ input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
 }
 
 
-int spawnBlock(int rows, int cols ,int **array){
+int spawnBlock(int rows, int cols ,int **array,int num){
+
+    int rNum;
+    //int flag=0;
+    if(num==0){
     if(rows < 5||cols<5){
         printf("to few rows/columns");
         return -1;
     }
-     int rNum = (rand() % (7 - 1 + 1)) + 1;
+     if(nextBlock==0){
+     rNum = (rand() % (7 - 1 + 1)) + 1;
+     nextBlock = (rand() % (7 - 1 + 1)) + 1;
+     printf("Next block :%d",nextBlock);
+    // flag=1;
+     }
+     else {
+        rNum = nextBlock;
+        nextBlock = (rand() % (7 - 1 + 1)) + 1;
+        printf("Next block :%d",nextBlock);
+     }
+
+    }else{
+        rNum = num;
+    }
+
+    // rNum = (rand() % (7 - 1 + 1)) + 1;
+    // nextBlock = (rand() % (7 - 1 + 1)) + 1;
     //int a,b;
     //rNum=T;//!REMEMBER ME
     rotState = 0;
