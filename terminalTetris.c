@@ -35,12 +35,13 @@ enum Block{
     J,
     T,
 };
+     int rotState=0;
      int nextBlock=0;
      int currentBlock;
-     int rotState;
 int spawnBlock(int rows, int cols ,int **array,int num);
 void checkLines(int rows, int cols ,int **array);
 void incrementRot(){
+    printf("Incrementing rot\n");
     (rotState < 3) ? (rotState++) : (rotState=0);
 }
 void resetGameState(int rows, int cols ,int **array){
@@ -114,7 +115,7 @@ if (array[i][j]==2){
         printf("\t |");
         for(int a=0;a<nextBox;a++){
             if (matrix[i][a]==0){
-            printf(" ");
+           printf(" ");
             }
             if (matrix[i][a]==1){
             printf("#");
@@ -392,7 +393,7 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         int box[4][4]={0};
         int paddingY;
         int paddingX;
-        //printf("RotState: %d\n",rotState);
+        printf("RotState: %d\n",rotState);
         if(rotState==0){
         paddingY = CordArray[0]-1;
         paddingX = CordArray[1];
@@ -444,8 +445,8 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             }
         
         }
-          //  printf("Cord Array after rotation\nXpad %d Ypad %d\n",paddingX,paddingY);
-           // printArray(CordArray2);
+            printf("Cord Array after rotation\nXpad %d Ypad %d\n",paddingX,paddingY);
+            printArray(CordArray2);
             appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum);
 
            // rotState++;
@@ -453,7 +454,7 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             case Z://z
         int padY;
         int padX;
-        //printf("RotState: %d\n",rotState);
+        printf("RotState: %d\n",rotState);
                 if(rotState==0){
         padY = 0;
         padX = 0;
@@ -509,11 +510,13 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             Zrotate(rows,cols,array,CordArray,blockNum,lpadX,lpadY);
         break;
             case J://j
+        //printf("RotState: %d\n",rotState);
         int jpadY = 0;
         int jpadX = 0;
             Zrotate(rows,cols,array,CordArray,blockNum,jpadX,jpadY);
         break;
             case T://T
+        //printf("RotState: %d\n",rotState);
         int tpadY = 0;
         int tpadX = 0;
             Zrotate(rows,cols,array,CordArray,blockNum,tpadX,tpadY);
@@ -610,18 +613,19 @@ int main(void) {
     }
 
      resetGameState(rows,columns,GameState);
-     int CordArray[8] ={0};
-     int *pCordArray =CordArray;
+     int CordArray[8] = {0};
+     int *pCordArray = CordArray;
      int block = spawnBlock(rows,columns,GameState,0);
-     currentBlock = block;
+     int currentBlock = block;
      
      //int rotState;
 while (1 == 1)
 {
     char input;
-    //clearScreen();//!Remove to debug
-        printf("Block %d\n",currentBlock);
+    clearScreen();//!Remove to debug
+        //printf("Block %d\n",currentBlock);
             printGameState(rows,columns,GameState);
+            //printf("Rot:%d",rotState);
             //checkLines(rows,columns,GameState);
           //  scanf(" %c",&input);
 
@@ -661,8 +665,9 @@ input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
 int spawnBlock(int rows, int cols ,int **array,int num){
 
     int rNum;
-    //int flag=0;
+    int flag=0;
     if(num==0){
+    rotState = 0;
     if(rows < 5||cols<5){
         printf("to few rows/columns");
         return -1;
@@ -671,7 +676,7 @@ int spawnBlock(int rows, int cols ,int **array,int num){
      rNum = (rand() % (7 - 1 + 1)) + 1;
      nextBlock = (rand() % (7 - 1 + 1)) + 1;
      printf("Next block :%d",nextBlock);
-    // flag=1;
+     flag=1;
      }
      else {
         rNum = nextBlock;
@@ -687,7 +692,6 @@ int spawnBlock(int rows, int cols ,int **array,int num){
     // nextBlock = (rand() % (7 - 1 + 1)) + 1;
     //int a,b;
     //rNum=T;//!REMEMBER ME
-    rotState = 0;
     switch (rNum)
     {
     case block://block
