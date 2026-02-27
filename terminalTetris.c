@@ -38,7 +38,7 @@ enum Block{
      int rotState=0;
      int nextBlock=0;
      int currentBlock;
-int spawnBlock(int rows, int cols ,int **array,int num);
+int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num);
 void checkLines(int rows, int cols ,int **array);
 void incrementRot(){
     printf("Incrementing rot\n");
@@ -90,6 +90,7 @@ void printDynamic(int **arr,int rows,int cols){
 
 void printGameState(int rows, int cols ,int **array){
     int i , j;
+    int CordArray[8] = {9};
     int nextBox;
     if(nextBlock==line){
         nextBox=4;
@@ -98,7 +99,7 @@ void printGameState(int rows, int cols ,int **array){
     }
     int **matrix=malloc(sizeof(int *)*nextBox);
     resetGameState(nextBox,nextBox,matrix);
-    spawnBlock(2,nextBox,matrix,nextBlock);
+    spawnBlock(2,nextBox,matrix,CordArray,nextBlock);
     printDynamic(matrix,nextBox,nextBox);
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
@@ -155,7 +156,7 @@ for(a=0; a < cols; a++){
 
 }
 
-void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum);
+void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum,int rot);
 
 int setGround(int rows, int cols ,int **array,int *CordArray){
     findBlockCords(rows,cols,array,CordArray);
@@ -166,11 +167,10 @@ int setGround(int rows, int cols ,int **array,int *CordArray){
         printf("Value:%d",array[CordArray[i]][CordArray[i+1]]);
     }
     printf("\nSETGROUND GAME ARRAY");
-   int block = spawnBlock(rows,cols,array,0);
-
+   int block = spawnBlock(rows,cols,array,CordArray,0);
         findBlockCords(rows,cols,array,CordArray);
         checkLines(rows,cols,array);
-    printGameState(rows,cols,array);
+    //printGameState(rows,cols,array);
     return block;
 }
 void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
@@ -344,11 +344,11 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
         }
         //printf("Cord Array after rotation\nXpad %d Ypad %d\n",padX,padY);
         //printArray(CordArray_temp);
-        appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum);
+        appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum,0);
 
 }
 
-void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum){
+void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum,int rot){
     //int num=0;        
     printf("Appending\n");
             int padding;
@@ -447,7 +447,7 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         }
             printf("Cord Array after rotation\nXpad %d Ypad %d\n",paddingX,paddingY);
             printArray(CordArray2);
-            appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum);
+            appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum,0);
 
            // rotState++;
         break;
@@ -592,7 +592,7 @@ int advanceState(int rows, int cols ,int **array,int *CordArray){
                 findBlockCords(rows,cols,array,CordArray);
                 //printf("debug\n");
                 printArray(CordArray);
-                return -1;
+                return 0;
 }
 
 int main(void) {
@@ -615,7 +615,7 @@ int main(void) {
      resetGameState(rows,columns,GameState);
      int CordArray[8] = {0};
      int *pCordArray = CordArray;
-     int block = spawnBlock(rows,columns,GameState,0);
+     int block = spawnBlock(rows,columns,GameState,CordArray,0);
      int currentBlock = block;
      
      //int rotState;
@@ -631,14 +631,17 @@ while (1 == 1)
 
 input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
         if(input =='d'){
-            moveRight(rows,columns,GameState,pCordArray);
+            moveRight(rows,columns,GameState,CordArray);
         } 
         if(input =='a'){
-            moveLeft(rows,columns,GameState,pCordArray);
+            moveLeft(rows,columns,GameState,CordArray);
         }
         if(input =='s'){
-            int temp = advanceState(rows,columns,GameState,pCordArray);
-            if(temp != -1){
+            int temp = advanceState(rows,columns,GameState,CordArray);
+            if(temp == -1){
+                break;
+            }
+            if(temp != 0){
                 currentBlock = temp;
             }
         }
@@ -661,9 +664,17 @@ input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
     return 0;
 }
 
-
-int spawnBlock(int rows, int cols ,int **array,int num){
-
+void checkSpawnCords(int rows, int cols ,int **array,int *CordArray,int block){
+for(int i = 0;i<7;i+=2){
+        int Y = CordArray[i];
+        int X = CordArray[i+1];
+        if(Y <= 1){
+        //printf("Game over");
+        }
+    }
+}
+int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
+    int checkFlag=0;
     int rNum;
     int flag=0;
     if(num==0){
@@ -684,6 +695,15 @@ int spawnBlock(int rows, int cols ,int **array,int num){
         printf("Next block :%d",nextBlock);
      }
 
+
+
+        if(CordArray[0] <= 1){
+        //printf("Game over");
+           checkFlag = 1;
+        }else{
+           checkFlag = 0;
+        }
+    
     }else{
         rNum = num;
     }
@@ -691,16 +711,40 @@ int spawnBlock(int rows, int cols ,int **array,int num){
     // rNum = (rand() % (7 - 1 + 1)) + 1;
     // nextBlock = (rand() % (7 - 1 + 1)) + 1;
     //int a,b;
-    //rNum=T;//!REMEMBER ME
+    //rNum=block;//!REMEMBER ME
+    //if(Cord){
+//
+    //}
+
     switch (rNum)
     {
     case block://block
+    if(checkFlag == 1){
+    if(array[0][rows/2] == 2)
+    return -1;
+    if(array[0][rows/2+1] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2+1] == 2)
+    return -1;
+    }
     array[0][rows/2] = 1;
     array[0][rows/2+1]=1;
     array[1][rows/2] = 1;
     array[1][rows/2+1]=1;
         break;
         case line://line
+    if(checkFlag == 1){
+    if(array[0][rows/2-1] == 2)
+    return -1;
+    if(array[0][rows/2] == 2)
+    return -1;
+    if(array[0][rows/2+1] == 2)
+    return -1;
+    if(array[0][rows/2+2] == 2)
+    return -1;
+    }
     array[0][rows/2-1] = 1;
     array[0][rows/2]=1;
     array[0][rows/2+1] = 1;
@@ -708,6 +752,16 @@ int spawnBlock(int rows, int cols ,int **array,int num){
 
         break;
             case Z://z
+    if(checkFlag == 1){
+    if(array[0][rows/2-1] == 2)
+    return -1;
+    if(array[0][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2+1] == 2)
+    return -1;
+    }
     array[0][rows/2-1] = 1;
     array[0][rows/2]=1;
     array[1][rows/2] = 1;
@@ -715,6 +769,16 @@ int spawnBlock(int rows, int cols ,int **array,int num){
 
         break;
             case S://s
+    if(checkFlag == 1){
+    if(array[0][rows/2] == 2)
+    return -1;
+    if(array[0][rows/2+1] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2-1] == 2)
+    return -1;
+    }
     array[0][rows/2] = 1;
     array[0][rows/2+1]=1;
     array[1][rows/2] = 1;
@@ -722,6 +786,16 @@ int spawnBlock(int rows, int cols ,int **array,int num){
 
         break;
             case L://L
+    if(checkFlag == 1){
+    if(array[0][rows/2-1] == 2)
+    return -1;
+    if(array[1][rows/2-1] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2+1] == 2)
+    return -1;
+    }
     array[0][rows/2-1]=1;
     array[1][rows/2-1] = 1;
     array[1][rows/2] = 1;
@@ -729,6 +803,16 @@ int spawnBlock(int rows, int cols ,int **array,int num){
 
         break;
             case J://j
+    if(checkFlag == 1){
+    if(array[0][rows/2+1] == 2)
+    return -1;
+    if(array[1][rows/2+1] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2-1] == 2)
+    return -1;
+    }
     array[0][rows/2+1]=1;
     array[1][rows/2+1] = 1;
     array[1][rows/2] = 1;
@@ -736,6 +820,16 @@ int spawnBlock(int rows, int cols ,int **array,int num){
 
         break;
             case T://T
+    if(checkFlag == 1){
+    if(array[0][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2] == 2)
+    return -1;
+    if(array[1][rows/2-1] == 2)
+    return -1;
+    if(array[1][rows/2+1] == 2)
+    return -1;
+    }
     array[0][rows/2] = 1;
     array[1][rows/2]=1;
     array[1][rows/2-1] = 1;
