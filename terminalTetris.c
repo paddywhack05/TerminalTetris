@@ -403,19 +403,19 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         int paddingY;
         int paddingX;
         printf("RotState: %d\n",rotState);
-        if(rotState==0){
-        paddingY = CordArray[0]-1;
-        paddingX = CordArray[1];
-        }else if(rotState == 1){
-        paddingY = CordArray[0];
-        paddingX = CordArray[1]-2;
-        }else if(rotState == 2){
-        paddingY = CordArray[0]-2;
-        paddingX = CordArray[1];
-        }else if(rotState == 3){
-        paddingY = CordArray[0];
-        paddingX = CordArray[1]-1;
-        }
+
+        paddingX = (rotState==0) ? CordArray[1] : paddingX;
+        paddingY = (rotState==0) ? CordArray[0]-1 : paddingY;
+
+        paddingX = (rotState==1) ? CordArray[1]-2 : paddingX;
+        paddingY = (rotState==1) ? CordArray[0] : paddingY;
+
+        paddingX = (rotState==2) ? CordArray[1] : paddingX;
+        paddingY = (rotState==2) ? CordArray[0]-2 : paddingY;
+
+        paddingX = (rotState==3) ? CordArray[1]-1 : paddingX;
+        paddingY = (rotState==3) ? CordArray[0] : paddingY;
+
         for(int i=0;i<7;i+=2){
            int Y = CordArray[i]-paddingY;
            int X = CordArray[i+1]-paddingX;
