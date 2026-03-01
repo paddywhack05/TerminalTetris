@@ -96,6 +96,7 @@ void printGameState(int rows, int cols ,int **array){
     }else{
         nextBox=3;
     }
+    printf("nextBox:%d\n",nextBox);
     int **matrix=malloc(sizeof(int *)*nextBox);
     resetGameState(nextBox,nextBox,matrix);
     spawnBlock(2,nextBox,matrix,CordArray,nextBlock);
@@ -407,20 +408,20 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         paddingX = CordArray[1];
         }else if(rotState == 1){
         paddingY = CordArray[0];
-        paddingX = CordArray[1]-1;
+        paddingX = CordArray[1]-2;
         }else if(rotState == 2){
         paddingY = CordArray[0]-2;
         paddingX = CordArray[1];
         }else if(rotState == 3){
         paddingY = CordArray[0];
-        paddingX = CordArray[1]-2;
+        paddingX = CordArray[1]-1;
         }
         for(int i=0;i<7;i+=2){
            int Y = CordArray[i]-paddingY;
            int X = CordArray[i+1]-paddingX;
            box[Y][X]=1;
         }
-        //printFixed(box,4,4);
+        printFixed(box,4,4);
         //Transpose
         int box2[4][4]={0};
         for(int i=0;i<4;i++){
@@ -429,17 +430,16 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
                 //box[i][j] = 0;
             }
         }
-            //printf("After Transpose \n");
-            //printFixed(box2,4,4);
+            printf("After Transpose \n");
+            printFixed(box2,4,4);
         //Reverse
-        //int box3[4][4];
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
                 box[i][3-j] = box2[i][j];
             }
         }
-        //printf("After roto \n");
-           // printFixed(box,4,4);
+            printf("After roto \n");
+            printFixed(box,4,4);
             //printArray(CordArray);
             int num=0;
             int CordArray2[8];
@@ -453,36 +453,14 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
             }
         
         }
-            printf("Cord Array after rotation\nXpad %d Ypad %d\n",paddingX,paddingY);
-            printArray(CordArray2);
             appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum,0);
-
-           // rotState++;
         break;
-            case Z://z
-        printf("RotState: %d\n",rotState);
-
-            Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
-     
-        break;
-            case S://s
-            //printf("RotState: %d\n",rotState);
-
-            Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
-        break;
-            case L://L
-            Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
-        break;
-            case J://j
-            Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
-        break;
-            case T://T
+        default:
             Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
         break;
     }
 }
 void rotateLeft(int rows, int cols ,int **array,int *CordArray,int blockNum){
-    //array[i][j];
     //printf("Rotating\n");
     switch (blockNum)
     {
@@ -580,7 +558,7 @@ int main(void) {
 while (1 == 1)
 {
     char input;
-    clearScreen();//!Remove to debug
+    //clearScreen();//!Remove to debug
         //printf("Block %d\n",currentBlock);
         printf("\n\n\n");
             printGameState(rows,columns,GameState);
@@ -668,7 +646,7 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     // rNum = (rand() % (7 - 1 + 1)) + 1;
     // nextBlock = (rand() % (7 - 1 + 1)) + 1;
     //int a,b;
-    //rNum=Z;//!REMEMBER ME
+    //rNum=line;//!REMEMBER ME
     //if(Cord){
 //
     //}
