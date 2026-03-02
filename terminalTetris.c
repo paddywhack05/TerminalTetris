@@ -51,7 +51,13 @@ void resetGameState(int rows, int cols ,int **array){
 for (i = 0; i < cols; i++) {
     array[i] = calloc(rows,sizeof(int));//malloc(sizeof(int)*rows);
 }
-int a,b;
+return;
+}
+void freeGameState(int rows, int cols ,int **array){
+    int i , j;
+for (i = 0; i < cols; i++) {
+    free(array[i]);
+}
 return;
 }
 void printFixed(int arr[4][4], int n, int m)
@@ -132,6 +138,9 @@ if (array[i][j]==2){
     }
   }
 }
+freeGameState(nextBox,nextBox,matrix);
+free(matrix);
+matrix = NULL;
 }
 void changeGameState(int rows, int cols ,int **array){
 int a,b;
@@ -637,7 +646,7 @@ int main(void) {
         printf("malloc is fucked");
         return 1;
     }
-
+     reset:
      resetGameState(rows,columns,GameState);
      int CordArray[8] = {0};
      int *pCordArray = CordArray;
@@ -684,22 +693,20 @@ input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
         }
       //  findBlockCords(rows,columns,GameState,pCordArray);
 }
-
+    char answer;
+    printf("Game Over\nPlay Again y/n\n");
+    scanf(" %c",&answer);
+    if(answer =='y'||answer=='Y'){
+       // memset(GameState, 0, sizeof(GameState[0][0]) * rows * columns);
+        goto reset;
+    }
+    freeGameState(rows,columns,GameState);
         free(GameState);
      GameState = NULL;
     printf("GAME OVER");
     return 0;
 }
 
-void checkSpawnCords(int rows, int cols ,int **array,int *CordArray,int block){
-for(int i = 0;i<7;i+=2){
-        int Y = CordArray[i];
-        int X = CordArray[i+1];
-        if(Y <= 1){
-        //printf("Game over");
-        }
-    }
-}
 int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     int checkFlag=0;
     int rNum;
@@ -723,7 +730,6 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
 
 
         if(CordArray[0] <= 1){
-        //printf("Game over");
            checkFlag = 1;
         }else{
            checkFlag = 0;
@@ -733,13 +739,7 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
         rNum = num;
     }
 
-    // rNum = (rand() % (7 - 1 + 1)) + 1;
-    // nextBlock = (rand() % (7 - 1 + 1)) + 1;
-    //int a,b;
     //rNum=line;//!REMEMBER ME
-    //if(Cord){
-//
-    //}
 
     switch (rNum)
     {
