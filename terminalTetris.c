@@ -649,7 +649,6 @@ int main(void) {
      reset:
      resetGameState(rows,columns,GameState);
      int CordArray[8] = {0};
-     int *pCordArray = CordArray;
      int block = spawnBlock(rows,columns,GameState,CordArray,0);
      int currentBlock = block;
      
@@ -657,15 +656,11 @@ int main(void) {
 while (1 == 1)
 {
     char input;
-    //clearScreen();//!Remove to debug
-        //printf("Block %d\n",currentBlock);
+    clearScreen();//!Remove to debug
         printf("\n\n\n");
             printGameState(rows,columns,GameState);
-            //printf("Rot:%d",rotState);
-            //checkLines(rows,columns,GameState);
-          //  scanf(" %c",&input);
 
-input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
+input = getch();
         if(input =='d'){
             moveRight(rows,columns,GameState,CordArray);
         } 
@@ -686,21 +681,19 @@ input = getch();          //  advanceState(rows,columns,GameState,pCordArray);
             break;
         }
         if(input =='e'){
-            rotateRight(rows,columns,GameState,pCordArray,currentBlock);
+            rotateRight(rows,columns,GameState,CordArray,currentBlock);
         }
         if(input =='q'){
-            rotateLeft(rows,columns,GameState,pCordArray,currentBlock);
+            rotateLeft(rows,columns,GameState,CordArray,currentBlock);
         }
-      //  findBlockCords(rows,columns,GameState,pCordArray);
 }
     char answer;
+        freeGameState(rows,columns,GameState);
     printf("Game Over\nPlay Again y/n\n");
     scanf(" %c",&answer);
     if(answer =='y'||answer=='Y'){
-       // memset(GameState, 0, sizeof(GameState[0][0]) * rows * columns);
         goto reset;
     }
-    freeGameState(rows,columns,GameState);
         free(GameState);
      GameState = NULL;
     printf("GAME OVER");
