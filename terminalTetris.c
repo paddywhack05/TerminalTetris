@@ -275,7 +275,71 @@ void moveLeft(int rows, int cols ,int **array,int *CordArray){
         }
                 findBlockCords(rows,cols,array,CordArray);
 }
-void Lrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX,int padY){
+void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int direction){
+        int box[4][4]={0};
+        int paddingY;
+        int paddingX;
+        printf("RotState: %d\n",rotState);
+
+        paddingX = (rotState==0) ? CordArray[1] : paddingX;
+        paddingY = (rotState==0) ? CordArray[0]-1 : paddingY;
+
+        paddingX = (rotState==1) ? CordArray[1]-2 : paddingX;
+        paddingY = (rotState==1) ? CordArray[0] : paddingY;
+
+        paddingX = (rotState==2) ? CordArray[1] : paddingX;
+        paddingY = (rotState==2) ? CordArray[0]-2 : paddingY;
+
+        paddingX = (rotState==3) ? CordArray[1]-1 : paddingX;
+        paddingY = (rotState==3) ? CordArray[0] : paddingY;
+
+        for(int i=0;i<7;i+=2){
+           int Y = CordArray[i]-paddingY;
+           int X = CordArray[i+1]-paddingX;
+           box[Y][X]=1;
+        }
+        printFixed(box,4,4);
+        //Transpose
+        int box2[4][4]={0};
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                box2[i][j] = box[j][i];
+                //box[i][j] = 0;
+            }
+        }
+            printf("After Transpose \n");
+            printFixed(box2,4,4);
+        //Reverse
+        if(direction == 0){
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                box[i][3-j] = box2[i][j];
+            }
+        }
+        }else if(direction == 1){
+            for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                box[3-i][j] = box2[i][j];
+            }
+        }
+        }
+            printf("After roto \n");
+            printFixed(box,4,4);
+            //printArray(CordArray);
+            int num=0;
+            int CordArray2[8];
+        for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+        if(box[i][j]==1){
+            CordArray2[num]=i+paddingY;
+            CordArray2[num+1]=j+paddingX;
+            num +=2;
+            }
+            }
+        }
+            appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum,direction);
+}
+void rotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX,int padY,int direction){
             int matrix[3][3]={0};
 
         //Loop through x cords set lowest to var
@@ -320,80 +384,19 @@ void Lrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
                matrix[i][j] = matrix2[i][j];
             }
         }
+        if(direction==1){
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
                 matrix[i][j] = matrix2[2-i][j];
             }
         }
-                printf("After roto \n");
-            printFixed2(matrix,3,3);
-            int index=0;
-            int CordArray_temp[8];
-        for(int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-        if(matrix[i][j]==1){
-            CordArray_temp[index]=i+Ynum;
-            CordArray_temp[index+1]=j+Xnum;
-            index +=2;
-            }
-            }
-        
-        }
-        //printf("Cord Array after rotation\nXpad %d Ypad %d\n",padX,padY);
-        //printArray(CordArray_temp);
-        appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum,1);
-
-}
-void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX,int padY){
-            int matrix[3][3]={0};
-
-        //Loop through x cords set lowest to var
-        int Xnum = CordArray[1];
-        for(int i=3;i<8;i+=2){
-            if(CordArray[i]<Xnum){
-            Xnum = CordArray[i];
-            }else{
-                continue;
-            }
-        }
-        int Ynum = CordArray[0];
-        for(int i=2;i<8;i+=2){
-            if(CordArray[i]<Ynum){
-            Ynum = CordArray[i];
-            }else{
-                continue;
-            }
-        }
-        for(int i=0;i<7;i+=2){
-           int Y = CordArray[i]-Ynum+padY;
-           int X = CordArray[i+1]-Xnum+padX;
-           matrix[Y][X]=1;
-        }
-        printf("RotState: %d\n",rotState);
-        printFixed2(matrix,3,3);
-        //Transpose
-        int matrix2[3][3]={0};
-
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-                matrix2[i][j] = matrix[j][i];
-            }
-        }
-            printf("After Transpose \n");
-            printFixed2(matrix2,3,3);
-        //Reverse
-
+        }else if(direction==0){
             for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-               // matrix[i][j] = matrix2[2-i][2-j];
-               matrix[i][j] = matrix2[i][j];
-            }
-        }
-        for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
                 matrix[i][j] = matrix2[i][2-j];
             }
         }
+        }
                 printf("After roto \n");
             printFixed2(matrix,3,3);
             int index=0;
@@ -410,7 +413,7 @@ void Zrotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int pad
         }
         //printf("Cord Array after rotation\nXpad %d Ypad %d\n",padX,padY);
         //printArray(CordArray_temp);
-        appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum,0);
+        appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum,direction);
 
 }
 
@@ -469,64 +472,10 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         return;
         break;
         case line://line
-        int box[4][4]={0};
-        int paddingY;
-        int paddingX;
-        printf("RotState: %d\n",rotState);
-
-        paddingX = (rotState==0) ? CordArray[1] : paddingX;
-        paddingY = (rotState==0) ? CordArray[0]-1 : paddingY;
-
-        paddingX = (rotState==1) ? CordArray[1]-2 : paddingX;
-        paddingY = (rotState==1) ? CordArray[0] : paddingY;
-
-        paddingX = (rotState==2) ? CordArray[1] : paddingX;
-        paddingY = (rotState==2) ? CordArray[0]-2 : paddingY;
-
-        paddingX = (rotState==3) ? CordArray[1]-1 : paddingX;
-        paddingY = (rotState==3) ? CordArray[0] : paddingY;
-
-        for(int i=0;i<7;i+=2){
-           int Y = CordArray[i]-paddingY;
-           int X = CordArray[i+1]-paddingX;
-           box[Y][X]=1;
-        }
-        printFixed(box,4,4);
-        //Transpose
-        int box2[4][4]={0};
-        for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
-                box2[i][j] = box[j][i];
-                //box[i][j] = 0;
-            }
-        }
-            printf("After Transpose \n");
-            printFixed(box2,4,4);
-        //Reverse
-        for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
-                box[i][3-j] = box2[i][j];
-            }
-        }
-            printf("After roto \n");
-            printFixed(box,4,4);
-            //printArray(CordArray);
-            int num=0;
-            int CordArray2[8];
-        for(int i=0;i<4;i++){
-        for(int j=0;j<4;j++){
-        if(box[i][j]==1){
-            CordArray2[num]=i+paddingY;
-            CordArray2[num+1]=j+paddingX;
-            num +=2;
-            }
-            }
-        
-        }
-            appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum,0);
+           rotateLine(rows,cols,array,CordArray,blockNum,0);
         break;
         default:
-            Zrotate(rows,cols,array,CordArray,blockNum,padX,padY);
+            rotate(rows,cols,array,CordArray,blockNum,padX,padY,0);
         break;
     }
 }
@@ -542,64 +491,10 @@ void rotateLeft(int rows, int cols ,int **array,int *CordArray,int blockNum){
         return;
         break;
         case line://line
-        int box[4][4]={0};
-        int paddingY;
-        int paddingX;
-        printf("RotState: %d\n",rotState);
-
-        paddingX = (rotState==0) ? CordArray[1] : paddingX;
-        paddingY = (rotState==0) ? CordArray[0]-1 : paddingY;
-
-        paddingX = (rotState==1) ? CordArray[1]-2 : paddingX;
-        paddingY = (rotState==1) ? CordArray[0] : paddingY;
-
-        paddingX = (rotState==2) ? CordArray[1] : paddingX;
-        paddingY = (rotState==2) ? CordArray[0]-2 : paddingY;
-
-        paddingX = (rotState==3) ? CordArray[1]-1 : paddingX;
-        paddingY = (rotState==3) ? CordArray[0] : paddingY;
-
-        for(int i=0;i<7;i+=2){
-           int Y = CordArray[i]-paddingY;
-           int X = CordArray[i+1]-paddingX;
-           box[Y][X]=1;
-        }
-        printFixed(box,4,4);
-        //Transpose
-        int box2[4][4]={0};
-        for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
-                box2[i][j] = box[j][i];
-                //box[i][j] = 0;
-            }
-        }
-            printf("After Transpose \n");
-            printFixed(box2,4,4);
-        //Reverse
-        for(int i=0;i<4;i++){
-            for(int j=0;j<4;j++){
-                box[3-i][j] = box2[i][j];
-            }
-        }
-            printf("After roto \n");
-            printFixed(box,4,4);
-            //printArray(CordArray);
-            int num=0;
-            int CordArray2[8];
-        for(int i=0;i<4;i++){
-        for(int j=0;j<4;j++){
-        if(box[i][j]==1){
-            CordArray2[num]=i+paddingY;
-            CordArray2[num+1]=j+paddingX;
-            num +=2;
-            }
-            }
-        
-        }
-            appendCordArray(rows,cols,array,CordArray,CordArray2,blockNum,1);
+           rotateLine(rows,cols,array,CordArray,blockNum,1);
         break;
         default:
-            Lrotate(rows,cols,array,CordArray,blockNum,padX,padY);
+            rotate(rows,cols,array,CordArray,blockNum,padX,padY,1);
         break;
     }
 }
@@ -656,7 +551,7 @@ int main(void) {
 while (1 == 1)
 {
     char input;
-    clearScreen();//!Remove to debug
+    //clearScreen();//!Remove to debug
         printf("\n\n\n");
             printGameState(rows,columns,GameState);
 
