@@ -10,6 +10,7 @@
 #else
 #include <termios.h>
 #include <unistd.h> 
+#include <sys/select.h>
 int getch(void){
   struct termios oldattr, newattr;
   unsigned char ch;
@@ -21,6 +22,25 @@ int getch(void){
   retcode=read(STDIN_FILENO, &ch, 1);
   tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
   return retcode<=0? EOF: (int)ch;
+}
+
+int _kbhit(void)
+{
+struct timeval tv;
+fd_set read_fd;
+
+tv.tv_sec=0;
+tv.tv_usec=0;
+FD_ZERO(&read_fd);
+FD_SET(0,&read_fd);
+
+if(select(1, &read_fd, NULL, NULL, &tv) == -1)
+return 0;
+
+if(FD_ISSET(0,&read_fd))
+return 1;
+
+return 0;
 }
 void clearScreen(){
     system("clear");
@@ -542,19 +562,36 @@ int main(void) {
         return 1;
     }
      reset:
+    time_t t = time(NULL);
+    time_t currentT = time(NULL);
      resetGameState(rows,columns,GameState);
      int CordArray[8] = {0};
      int block = spawnBlock(rows,columns,GameState,CordArray,0);
      int currentBlock = block;
-     
+                 printGameState(rows,columns,GameState);
      //int rotState;
 while (1 == 1)
 {
+    currentT = time(NULL);
+    //printf("Current time %d\n",(int)currentT);
+    //printf("time %d\n",(int)t);
+    if((int)currentT - (int)t == 1){
+        t=currentT;
+        int temp = advanceState(rows,columns,GameState,CordArray);
+            if(temp == -1){
+                break;
+            }
+            if(temp != 0){
+                currentBlock = temp;
+            }
+        currentT = time(NULL);
+                            printf("\n\n\n");
+            printGameState(rows,columns,GameState);
+    }
     char input;
     //clearScreen();//!Remove to debug
-        printf("\n\n\n");
-            printGameState(rows,columns,GameState);
-
+    
+if(_kbhit()){
 input = getch();
         if(input =='d'){
             moveRight(rows,columns,GameState,CordArray);
@@ -581,6 +618,9 @@ input = getch();
         if(input =='q'){
             rotateLeft(rows,columns,GameState,CordArray,currentBlock);
         }
+            printf("\n\n\n");
+            printGameState(rows,columns,GameState);
+}
 }
     char answer;
         freeGameState(rows,columns,GameState);
