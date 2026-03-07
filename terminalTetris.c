@@ -613,11 +613,11 @@ while (1 == 1)
                 currentBlock = temp;
             }
         currentT = time(NULL);
+            clearScreen();//!Remove to debug
                             printf("\n\n\n");
             printGameState(rows,columns,GameState);
     }
     char input;
-    clearScreen();//!Remove to debug
 int linput;
 linput = _kbhit();
 if(linput){
@@ -652,6 +652,7 @@ printf("key code %d \n",input);
         if(input =='q'){
             rotateLeft(rows,columns,GameState,CordArray,currentBlock);
         }
+            clearScreen();//!Remove to debug
             printf("\n\n\n");
             printGameState(rows,columns,GameState);
 }
