@@ -53,6 +53,8 @@ enum Block{
      int rotState=0;
      int nextBlock=0;
      int currentBlock;
+     int score=0;
+     int totalLinesCleared=0;
 int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num);
 void checkLines(int rows, int cols ,int **array);
 void incrementRot(){
@@ -67,6 +69,24 @@ for (i = 0; i < cols; i++) {
     array[i] = calloc(rows,sizeof(int));//malloc(sizeof(int)*rows);
 }
 return;
+}
+void givePoints(int linesCleared){
+    totalLinesCleared += linesCleared;
+    switch (linesCleared)
+    {
+    case 1:
+        score += 100;
+        break;
+    case 2:
+        score += 300;
+        break;
+    case 3:
+        score += 500;
+        break;
+    case 4:
+        score += 1000;
+        break;
+    }
 }
 void freeGameState(int rows, int cols ,int **array){
     int i , j;
@@ -136,13 +156,16 @@ for (i = 0; i < cols; i++) {
 if (array[i][j]==2){
         printf("2");
     }
-    if(i<2&&j==rows-1){
+    if(i==0&&j==rows-1){
+        printf("\t score:%d",score);
+    }
+    if(i==1&&j==rows-1||i==2&&j==rows-1){
         printf("\t |");
         for(int a=0;a<nextBox;a++){
-            if (matrix[i][a]==0){
+            if (matrix[i-1][a]==0){
            printf(" ");
             }
-            if (matrix[i][a]==1){
+            if (matrix[i-1][a]==1){
             printf("#");
             }      
             //printf("%d",matrix[i][a]);
@@ -204,7 +227,7 @@ void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
 
     for (int i = index-1;i>=0;i--){
         printf("i= %d\n",i);
-        for(int j = listToClear[i];j>0;j--){
+        for(int j = listToClear[i];j>1;j--){
             printf("j=%d",j);
             for(int a = 0;a<rows;a++){
                 if(array[j-1][a]==2){
@@ -255,6 +278,7 @@ for (i = cols-1; i > 0; i--) {
     
     if(anotherIndex > 0){
         clearLines(rows,cols,array,linesToClear,anotherIndex);
+        givePoints(anotherIndex);
     }
     return;
 }
