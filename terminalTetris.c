@@ -11,36 +11,31 @@
 #include <termios.h>
 #include <unistd.h> 
 #include <sys/select.h>
-int getch(void){
-  struct termios oldattr, newattr;
-  unsigned char ch;
-  int retcode;
-  tcgetattr(STDIN_FILENO, &oldattr);
-  newattr=oldattr;
-  newattr.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &newattr);
-  retcode=read(STDIN_FILENO, &ch, 1);
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldattr);
-  return retcode<=0? EOF: (int)ch;
-}
+#include <fcntl.h>
 
-int _kbhit(void)
+int _kbhit()
 {
-struct timeval tv;
-fd_set read_fd;
+    struct termios oldt, newt;
+    int ch;
+    int oldf;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
-tv.tv_sec=0;
-tv.tv_usec=0;
-FD_ZERO(&read_fd);
-FD_SET(0,&read_fd);
+    ch = getchar();
 
-if(select(1, &read_fd, NULL, NULL, &tv) == -1)
-return 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
 
-if(FD_ISSET(0,&read_fd))
-return 1;
-
-return 0;
+    if(ch != EOF)
+    {
+        //ungetc(ch, stdin);
+        return ch;
+    }
+    return 0;
 }
 void clearScreen(){
     system("clear");
@@ -561,6 +556,7 @@ int main(void) {
         printf("malloc is fucked");
         return 1;
     }
+
      reset:
     time_t t = time(NULL);
     time_t currentT = time(NULL);
@@ -590,9 +586,15 @@ while (1 == 1)
     }
     char input;
     //clearScreen();//!Remove to debug
-    
-if(_kbhit()){
+int linput;
+linput = _kbhit();
+if(linput){
+    #ifdef _WIN32
 input = getch();
+    #else
+    input = linput;
+    #endif
+printf("key code %d \n",input);
         if(input =='d'){
             moveRight(rows,columns,GameState,CordArray);
         } 
@@ -621,6 +623,7 @@ input = getch();
             printf("\n\n\n");
             printGameState(rows,columns,GameState);
 }
+//printf("non blocking\n");
 }
     char answer;
         freeGameState(rows,columns,GameState);
