@@ -94,7 +94,7 @@ void printFixed2(int arr[3][3], int n, int m)
     }
 }
 void printArray(int arr[8]){
-    for(int i; i < 8 ;i++){
+    for(int i=0; i < 8 ;i++){
         printf("%d",arr[i]);
         if(i==sizeof(*arr/sizeof(int))-1){
         printf("\n");
@@ -201,17 +201,20 @@ int setGround(int rows, int cols ,int **array,int *CordArray){
     return block;
 }
 void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
-    int i,j;
-    int diff = listToClear[0] - listToClear[index-1];
-    int startRow = listToClear[0]-diff;
-    for(i=startRow;i>0;i--){
-  for(j=0; j<rows;j++){
-    if(array[i][j]==2){
-        array[i][j]=0;
-        array[i+index][j]=2;
+
+    for (int i = index-1;i>=0;i--){
+        printf("i= %d\n",i);
+        for(int j = listToClear[i];j>0;j--){
+            printf("j=%d",j);
+            for(int a = 0;a<rows;a++){
+                if(array[j-1][a]==2){
+                     array[j-1][a]=0;
+                     array[j][a]=2;
+                }
+            }
+        }
     }
-    }
-    }
+
 }
 void clearLines(int rows, int cols ,int **array,int *listToClear,int index){
     //printf("clear %d,%d",listToClear[index-1],index);
@@ -235,7 +238,7 @@ void checkLines(int rows, int cols ,int **array){
 for (i = cols-1; i > 0; i--) {
         int num = rows;
   for (j = 0; j < rows; j++) {
-        if(array[i][j]!=array[i][0]||array[i][j]!=2){
+        if(array[i][j]!=2){
             break;
         }else{
             num--;
