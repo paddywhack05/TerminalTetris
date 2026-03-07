@@ -590,6 +590,8 @@ int main(void) {
     }
 
      reset:
+     score=0;
+     totalLinesCleared=0;
     time_t t = time(NULL);
     time_t currentT = time(NULL);
      resetGameState(rows,columns,GameState);
