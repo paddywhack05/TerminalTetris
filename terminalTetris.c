@@ -578,6 +578,11 @@ int main(void) {
     printf("how many columns\n");
     scanf("%d",&columns);
     printf("columns:%d\n",columns);
+    if(rows < 5||columns<5){
+        printf("to few rows/columns");
+        rows=10;
+        columns=16;
+    }
      int **GameState = malloc(sizeof(int *)*columns);
     if(GameState == NULL){
         printf("malloc is fucked");
@@ -612,7 +617,7 @@ while (1 == 1)
             printGameState(rows,columns,GameState);
     }
     char input;
-    //clearScreen();//!Remove to debug
+    clearScreen();//!Remove to debug
 int linput;
 linput = _kbhit();
 if(linput){
@@ -671,10 +676,6 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     int flag=0;
     if(num==0){
     rotState = 0;
-    if(rows < 5||cols<5){
-        printf("to few rows/columns");
-        return -1;
-    }
      if(nextBlock==0){
      rNum = (rand() % (7 - 1 + 1)) + 1;
      nextBlock = (rand() % (7 - 1 + 1)) + 1;
