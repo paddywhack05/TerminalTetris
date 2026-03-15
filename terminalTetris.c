@@ -4,9 +4,15 @@
 #include <time.h>
 #ifdef _WIN32
     #include <conio.h>
+    #include <windows.h>
+    #include <sysinfoapi.h>
     void clearScreen(){
     system("cls");
     }
+    long uniTime(){
+        DWORD t = GetTickCount();
+    return (long)t;
+}
 #else
 #include <termios.h>
 #include <unistd.h> 
@@ -39,6 +45,13 @@ int _kbhit()
 }
 void clearScreen(){
     system("clear");
+}
+long uniTime(){
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC,&t);
+    long millisec = t.tv_sec*1000;
+    long milli = t.tv_nsec/1e+6;
+    return millisec + milli;
 }
 #endif
 enum Block{
@@ -95,41 +108,7 @@ for (i = 0; i < cols; i++) {
 }
 return;
 }
-void printFixed(int arr[4][4], int n, int m)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < m; j++)
-            printf("%d ", arr[i][j]);
-        printf("\n");
-    }
-}
-void printFixed2(int arr[3][3], int n, int m)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < m; j++)
-            printf("%d ", arr[i][j]);
-        printf("\n");
-    }
-}
-void printArray(int arr[8]){
-    for(int i=0; i < 8 ;i++){
-        printf("%d",arr[i]);
-        if(i==sizeof(*arr/sizeof(int))-1){
-        printf("\n");
-        };
-    }
-}
-void printDynamic(int **arr,int rows,int cols){
-    for (int i = 0; i < cols; i++)
-    {
-        for (int j = 0; j < rows; j++){
-            printf("%d ", arr[i][j]);
-        }
-        printf("\n");
-    }
-}
+
 
 void printGameState(int rows, int cols ,int **array){
     int i , j;
@@ -140,11 +119,9 @@ void printGameState(int rows, int cols ,int **array){
     }else{
         nextBox=3;
     }
-    printf("nextBox:%d\n",nextBox);
     int **matrix=malloc(sizeof(int *)*nextBox);
     resetGameState(nextBox,nextBox,matrix);
     spawnBlock(2,nextBox,matrix,CordArray,nextBlock);
-    //printDynamic(matrix,nextBox,nextBox);
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
     if (array[i][j]==0){
@@ -168,7 +145,6 @@ if (array[i][j]==2){
             if (matrix[i-1][a]==1){
             printf("#");
             }      
-            //printf("%d",matrix[i][a]);
         }
     }
     if(j==rows-1){
@@ -210,25 +186,18 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
 
 int setGround(int rows, int cols ,int **array,int *CordArray){
     findBlockCords(rows,cols,array,CordArray);
-   // printf("setting ground");
-   // printArray(CordArray);
     for(int i=0; i<7;i+=2){
         array[CordArray[i]][CordArray[i+1]]=2;
-        //printf("Value:%d",array[CordArray[i]][CordArray[i+1]]);
     }
-    //printf("\nSETGROUND GAME ARRAY");
    int block = spawnBlock(rows,cols,array,CordArray,0);
         findBlockCords(rows,cols,array,CordArray);
         checkLines(rows,cols,array);
-    //printGameState(rows,cols,array);
     return block;
 }
 void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
 
     for (int i = index-1;i>=0;i--){
-        printf("i= %d\n",i);
         for(int j = listToClear[i];j>1;j--){
-            printf("j=%d",j);
             for(int a = 0;a<rows;a++){
                 if(array[j-1][a]==2){
                      array[j-1][a]=0;
@@ -240,13 +209,9 @@ void groundGravity(int rows, int cols ,int **array,int *listToClear,int index){
 
 }
 void clearLines(int rows, int cols ,int **array,int *listToClear,int index){
-    //printf("clear %d,%d",listToClear[index-1],index);
     int i,j;
     for(i=0;i<index;i++){
-        //printf("cleared %d",listToClear[i]);
   for(j=0; j<rows;j++){
-    //int cordarray[listToClear[i]][j];
-        //memset(,0,rows);
         array[listToClear[i]][j]=0;
     }
     }
@@ -255,7 +220,6 @@ void clearLines(int rows, int cols ,int **array,int *listToClear,int index){
 }
 void checkLines(int rows, int cols ,int **array){
     int linesToClear[4];
-   // printf("%d",sizeof(linesToClear));
     int anotherIndex=0;
     int i , j;
 for (i = cols-1; i > 0; i--) {
@@ -272,7 +236,6 @@ for (i = cols-1; i > 0; i--) {
             anotherIndex++;
         }
         if(num == 0){
-            printf("another index: %d\n",anotherIndex);
         }
     }
     
@@ -321,7 +284,6 @@ void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int 
         int box[4][4]={0};
         int paddingY;
         int paddingX;
-        printf("RotState: %d\n",rotState);
 
         paddingX = (rotState==0) ? CordArray[1] : paddingX;
         paddingY = (rotState==0) ? CordArray[0]-1 : paddingY;
@@ -340,7 +302,6 @@ void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int 
            int X = CordArray[i+1]-paddingX;
            box[Y][X]=1;
         }
-        printFixed(box,4,4);
         //Transpose
         int box2[4][4]={0};
         for(int i=0;i<4;i++){
@@ -349,8 +310,6 @@ void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int 
                 //box[i][j] = 0;
             }
         }
-            printf("After Transpose \n");
-            printFixed(box2,4,4);
         //Reverse
         if(direction == 0){
         for(int i=0;i<4;i++){
@@ -365,9 +324,6 @@ void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int 
             }
         }
         }
-            printf("After roto \n");
-            printFixed(box,4,4);
-            //printArray(CordArray);
             int num=0;
             int CordArray2[8];
         for(int i=0;i<4;i++){
@@ -406,8 +362,6 @@ void rotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX
            int X = CordArray[i+1]-Xnum+padX;
            matrix[Y][X]=1;
         }
-        printf("RotState: %d\n",rotState);
-        printFixed2(matrix,3,3);
         //Transpose
         int matrix2[3][3]={0};
 
@@ -416,8 +370,6 @@ void rotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX
                 matrix2[i][j] = matrix[j][i];
             }
         }
-            printf("After Transpose \n");
-            printFixed2(matrix2,3,3);
         //Reverse
 
             for(int i=0;i<3;i++){
@@ -439,8 +391,6 @@ void rotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX
             }
         }
         }
-                printf("After roto \n");
-            printFixed2(matrix,3,3);
             int index=0;
             int CordArray_temp[8];
         for(int i=0;i<3;i++){
@@ -453,8 +403,6 @@ void rotate(int rows, int cols ,int **array,int *CordArray,int blockNum,int padX
             }
         
         }
-        //printf("Cord Array after rotation\nXpad %d Ypad %d\n",padX,padY);
-        //printArray(CordArray_temp);
         appendCordArray(rows,cols,array,CordArray,CordArray_temp,blockNum,direction);
 
 }
@@ -502,8 +450,6 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
             findBlockCords(rows,cols,array,CordArray);
 }
 void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
-    //array[i][j];
-    //printf("Rotating\n");
         int padY=0;
         int padX=0;
         padX = (rotState == 1) ? 1 : padX;
@@ -522,7 +468,6 @@ void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
     }
 }
 void rotateLeft(int rows, int cols ,int **array,int *CordArray,int blockNum){
-    //printf("Rotating\n");
         int padY=0;
         int padX=0;
         padX = (rotState == 1) ? 1 : padX;
@@ -542,15 +487,11 @@ void rotateLeft(int rows, int cols ,int **array,int *CordArray,int blockNum){
 }
 int advanceState(int rows, int cols ,int **array,int *CordArray){
     for(int i=7; i>0;i-=2){
-           // printf("\n\ncol nums %d\nindex %d",cols,i);
-           //printf("\n\n");
     if(CordArray[i-1]+1 > cols-1){
-           // printf("GROUND HIT");
         int block = setGround(rows,cols,array,CordArray);
         return block;
     }
         if(array[CordArray[i-1]+1][CordArray[i]] == 2){
-            //printf("GROUND 2 HIT");
         int block = setGround(rows,cols,array,CordArray);
         return block;
     }
@@ -562,8 +503,6 @@ int advanceState(int rows, int cols ,int **array,int *CordArray){
         }
 
                 findBlockCords(rows,cols,array,CordArray);
-                //printf("debug\n");
-                printArray(CordArray);
                 return 0;
 }
 
@@ -592,8 +531,8 @@ int main(void) {
      reset:
      score=0;
      totalLinesCleared=0;
-    time_t t = time(NULL);
-    time_t currentT = time(NULL);
+    long t = uniTime();
+    long currentT = uniTime();
      resetGameState(rows,columns,GameState);
      int CordArray[8] = {0};
      int block = spawnBlock(rows,columns,GameState,CordArray,0);
@@ -602,10 +541,8 @@ int main(void) {
      //int rotState;
 while (1 == 1)
 {
-    currentT = time(NULL);
-    //printf("Current time %d\n",(int)currentT);
-    //printf("time %d\n",(int)t);
-    if((int)currentT - (int)t == 1){
+    currentT = uniTime();
+    if(currentT - t >= 500){
         t=currentT;
         int temp = advanceState(rows,columns,GameState,CordArray);
             if(temp == -1){
@@ -614,7 +551,7 @@ while (1 == 1)
             if(temp != 0){
                 currentBlock = temp;
             }
-        currentT = time(NULL);
+        currentT = uniTime();
             clearScreen();//!Remove to debug
                             printf("\n\n\n");
             printGameState(rows,columns,GameState);
@@ -658,7 +595,6 @@ printf("key code %d \n",input);
             printf("\n\n\n");
             printGameState(rows,columns,GameState);
 }
-//printf("non blocking\n");
 }
     char answer;
         freeGameState(rows,columns,GameState);
