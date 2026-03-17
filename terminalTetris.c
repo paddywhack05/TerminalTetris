@@ -13,6 +13,12 @@
         DWORD t = GetTickCount();
     return (long)t;
 }
+enum arrowKeys{
+    UP_ARROW=72,
+    DOWN_ARROW=80,
+    LEFT_ARROW=75,
+    RIGHT_ARROW=77,
+};
 #else
 #include <termios.h>
 #include <unistd.h> 
@@ -53,6 +59,12 @@ long uniTime(){
     long milli = t.tv_nsec/1e+6;
     return millisec + milli;
 }
+enum arrowKeys{
+    UP_ARROW=65,
+    DOWN_ARROW=66,
+    LEFT_ARROW=68,
+    RIGHT_ARROW=67,
+};
 #endif
 enum Block{
     block = 1,
@@ -424,15 +436,15 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
             
         for(int i=0; i<7;i+=2){
         if(newCordArray[i]+paddingY>=cols||newCordArray[i+1]+padding>=rows){
-            printf("too far up/right");
+            //printf("too far up/right");
             return;
         }
         if(newCordArray[i+1]+padding<0||newCordArray[i]+paddingY<0){
-            printf("too far left");
+            //printf("too far left");
             return;
         }
         if(array[newCordArray[i]+paddingY][newCordArray[i+1]+padding]==2){
-            printf("colision");
+            //printf("colision");
             return;
         }
     }
@@ -561,9 +573,49 @@ int linput;
 linput = _kbhit();
 if(linput){
     #ifdef _WIN32
-input = getch();
+input = _getch();
+if(input==224||input==0){
+    input = _getch();
+    switch(input){
+        case UP_ARROW:
+        input='e';
+        break;
+        case DOWN_ARROW:
+        input='s';
+        break;
+        case LEFT_ARROW:
+        input='a';
+        break;
+        case RIGHT_ARROW:
+        input='d';
+        break;
+    }
+}
     #else
     input = linput;
+    int newinput;
+    if(input==27){
+        input=_kbhit();
+        input=_kbhit();
+        switch(input){
+        case UP_ARROW:
+        input='e';
+        break;
+        case DOWN_ARROW:
+        input='s';
+        break;
+        case LEFT_ARROW:
+        input='a';
+        break;
+        case RIGHT_ARROW:
+        input='d';
+        break;
+        default:
+        input = '\e';
+        break;
+        }
+    
+    }
     #endif
 printf("key code %d \n",input);
         if(input =='d'){
@@ -581,7 +633,7 @@ printf("key code %d \n",input);
                 currentBlock = temp;
             }
         }
-        if(input == 27){
+        if(input == '\e'){
             printf("Quiting\n");
             break;
         }
