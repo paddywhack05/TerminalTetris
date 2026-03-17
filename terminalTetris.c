@@ -164,6 +164,7 @@ if (array[i][j]==2){
     }
   }
 }
+    //fflush(stdout);
 freeGameState(nextBox,nextBox,matrix);
 free(matrix);
 matrix = NULL;
@@ -524,13 +525,16 @@ int main(void) {
     int columns=0;
 
     printf("How many rows\n");
+    //fflush(stdout);
     scanf("%d",&rows);  
     printf("rows:%d\n",rows);
     printf("how many columns\n");
+    //fflush(stdout);
     scanf("%d",&columns);
     printf("columns:%d\n",columns);
     if(rows < 5||columns<5){
-        printf("to few rows/columns");
+        printf("to few rows/columns\n");
+        //fflush(stdout);
         rows=10;
         columns=16;
     }
@@ -574,7 +578,7 @@ linput = _kbhit();
 if(linput){
     #ifdef _WIN32
 input = _getch();
-if(input==224||input==0){
+if(input==224||input==0||input == -32){
     input = _getch();
     switch(input){
         case UP_ARROW:
@@ -618,6 +622,7 @@ if(input==224||input==0){
     }
     #endif
 printf("key code %d \n",input);
+//fflush(stdout);
         if(input =='d'){
             moveRight(rows,columns,GameState,CordArray);
         } 
