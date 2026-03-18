@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <locale.h>
 #ifdef _WIN32
     #include <conio.h>
     #include <windows.h>
@@ -123,6 +124,22 @@ return;
 
 
 void printGameState(int rows, int cols ,int **array){
+    char *code;
+    code = setlocale(LC_ALL,".UTF-8");
+    char boxY[] = "│";
+    char boxX[] = "─";
+    char boxBL[] = "└";
+    char boxBR[] = "┘";
+    char boxTL[] = "┌";
+    char boxTR[] = "┐";
+    if(code==NULL){
+        strcpy(boxY,"|");
+        strcpy(boxX,"=");
+        strcpy(boxBL," ");
+        strcpy(boxBR," ");
+        strcpy(boxTL," ");
+        strcpy(boxTR," ");
+    }
     int i , j;
     int CordArray[8] = {9};
     int nextBox;
@@ -136,17 +153,17 @@ void printGameState(int rows, int cols ,int **array){
     spawnBlock(2,nextBox,matrix,CordArray,nextBlock);
 for(int a=0;a<rows;a++){
     if(a==0){
-        printf(" ");
+        printf("%s",boxTL);
     }
-printf("=");
+printf("%s",boxX);
 if(a==rows-1){
-    printf("\n");
+    printf("%s\n",boxTR);
 }
 }
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
     if(j==0){
-        printf("|");
+        printf("%s",boxY);
     }
     if (array[i][j]==0){
         printf(".");
@@ -158,7 +175,7 @@ if (array[i][j]==2){
         printf("2");
     }
 if(j==rows-1){
-    printf("|");
+    printf("%s",boxY);
 }
     if(i==0&&j==rows-1){
         printf("  score:%d",score);
@@ -181,11 +198,12 @@ if(j==rows-1){
 }
 for(int b=0;b<rows;b++){
 if(b==0){
-    printf(" ");
+    printf("%s",boxBL);
 }
-printf("=");
+printf("%s",boxX);
+
 if(b==rows-1){
-    printf("\n");
+    printf("%s\n",boxBR);
 }
 }
     //fflush(stdout);
