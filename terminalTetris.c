@@ -134,8 +134,20 @@ void printGameState(int rows, int cols ,int **array){
     int **matrix=malloc(sizeof(int *)*nextBox);
     resetGameState(nextBox,nextBox,matrix);
     spawnBlock(2,nextBox,matrix,CordArray,nextBlock);
+for(int a=0;a<rows;a++){
+    if(a==0){
+        printf(" ");
+    }
+printf("=");
+if(a==rows-1){
+    printf("\n");
+}
+}
 for (i = 0; i < cols; i++) {
   for (j = 0; j < rows; j++) {
+    if(j==0){
+        printf("|");
+    }
     if (array[i][j]==0){
         printf(".");
     } 
@@ -145,11 +157,14 @@ for (i = 0; i < cols; i++) {
 if (array[i][j]==2){
         printf("2");
     }
+if(j==rows-1){
+    printf("|");
+}
     if(i==0&&j==rows-1){
-        printf("\t score:%d",score);
+        printf("  score:%d",score);
     }
     if(i==1&&j==rows-1||i==2&&j==rows-1){
-        printf("\t |");
+        printf(" ");
         for(int a=0;a<nextBox;a++){
             if (matrix[i-1][a]==0){
            printf(" ");
@@ -163,6 +178,15 @@ if (array[i][j]==2){
         printf("\n");
     }
   }
+}
+for(int b=0;b<rows;b++){
+if(b==0){
+    printf(" ");
+}
+printf("=");
+if(b==rows-1){
+    printf("\n");
+}
 }
     //fflush(stdout);
 freeGameState(nextBox,nextBox,matrix);
