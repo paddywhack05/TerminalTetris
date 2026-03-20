@@ -81,6 +81,7 @@ enum Block{
      int currentBlock;
      int score=0;
      int totalLinesCleared=0;
+     char *UTF;
 int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num);
 void checkLines(int rows, int cols ,int **array);
 void incrementRot(){
@@ -124,15 +125,13 @@ return;
 
 
 void printGameState(int rows, int cols ,int **array){
-    char *code;
-    code = setlocale(LC_ALL,".UTF-8");
     char boxY[] = "│";
     char boxX[] = "─";
     char boxBL[] = "└";
     char boxBR[] = "┘";
     char boxTL[] = "┌";
     char boxTR[] = "┐";
-    if(code==NULL){
+    if(UTF==NULL){
         strcpy(boxY,"|");
         strcpy(boxX,"=");
         strcpy(boxBL," ");
@@ -565,7 +564,13 @@ int main(void) {
     srand(time(NULL));
     int rows=0;
     int columns=0;
-
+    setlocale(LC_CTYPE,"");
+    char *textMode = setlocale(LC_CTYPE,NULL);
+    if(strstr(textMode,".UTF-8")||strstr(textMode,".utf8")){
+        UTF = textMode;
+    }else{
+    UTF = setlocale(LC_ALL,".UTF-8");
+    }
     printf("How many rows\n");
     //fflush(stdout);
     scanf("%d",&rows);  
@@ -704,7 +709,7 @@ printf("key code %d \n",input);
     }
         free(GameState);
      GameState = NULL;
-    printf("GAME OVER");
+    printf("GAME OVER\n");
     return 0;
 }
 
