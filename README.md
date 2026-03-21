@@ -9,7 +9,7 @@ Command prompt: Every one has it does the job, \
 Powershell: I think its ugly but it works, \
 Any vs code teminal: I hate that it hides the differences but it works,
 ### Linux
-I tested it on the gnome Terminal which I think is xterm \
+I tested it on the gnome Terminal \
 But most should work and im not a linux daily driver
 ## Controls
 #### Arrow keys supported
