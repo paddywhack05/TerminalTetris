@@ -661,15 +661,13 @@ if(input==224||input==0||input == -32){
         case RIGHT_ARROW:
         input='d';
         break;
-        default:
+        case 0:
         input = '\e';
         break;
         }
     
     }
     #endif
-printf("key code %d \n",input);
-//fflush(stdout);
         if(input =='d'){
             moveRight(rows,columns,GameState,CordArray);
         } 
