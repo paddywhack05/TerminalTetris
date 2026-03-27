@@ -230,6 +230,9 @@ for(a=0; a < cols; a++){
         CordArray[num]=a;
         CordArray[num+1]=b;
         num +=2;
+        if(num==8){
+            return;
+        }
     }
   }
 }
