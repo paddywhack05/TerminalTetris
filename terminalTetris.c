@@ -221,33 +221,14 @@ for( a=0; a < cols; a++){
 }
 }
 
-void findBlockCords(int rows, int cols ,int **array,int*CordArray){    
-int a,b;
-int num=0;
-for(a=0; a < cols; a++){
-  for(b=0; b<rows;b++){
-    if(array[a][b]==1){
-        CordArray[num]=a;
-        CordArray[num+1]=b;
-        num +=2;
-        if(num==8){
-            return;
-        }
-    }
-  }
-}
-
-}
 
 void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCordArray,int blockNum,int rot);
 
 int setGround(int rows, int cols ,int **array,int *CordArray){
-    findBlockCords(rows,cols,array,CordArray);
     for(int i=0; i<7;i+=2){
         array[CordArray[i]][CordArray[i+1]]=2;
     }
    int block = spawnBlock(rows,cols,array,CordArray,0);
-        findBlockCords(rows,cols,array,CordArray);
         checkLines(rows,cols,array);
     return block;
 }
@@ -313,12 +294,11 @@ void moveRight(int rows, int cols ,int **array,int *CordArray){
         return;
     }
     }
-        findBlockCords(rows,cols,array,CordArray);
         for(int i=7; i>0;i-=2){
             array[CordArray[i-1]][CordArray[i]+1]=1;
             array[CordArray[i-1]][CordArray[i]]=0;
+            CordArray[i]=CordArray[i]+1;
         }
-                findBlockCords(rows,cols,array,CordArray);
 }
 
 void moveLeft(int rows, int cols ,int **array,int *CordArray){
@@ -330,12 +310,11 @@ void moveLeft(int rows, int cols ,int **array,int *CordArray){
         return;
     }
     }
-        findBlockCords(rows,cols,array,CordArray);
         for(int i=0; i<7;i+=2){
             array[CordArray[i]][CordArray[i+1]-1]=1;
             array[CordArray[i]][CordArray[i+1]]=0;
+            CordArray[i+1]=CordArray[i+1]-1;
         }
-                findBlockCords(rows,cols,array,CordArray);
 }
 void rotateLine(int rows, int cols ,int **array,int *CordArray,int blockNum,int direction){
         int box[4][4]={0};
@@ -498,13 +477,14 @@ void appendCordArray(int rows, int cols ,int **array,int *CordArray,int *newCord
         }
         for(int i=0; i<7;i+=2){
             array[newCordArray[i]+paddingY][newCordArray[i+1]+padding]=1;
+            CordArray[i]=newCordArray[i]+paddingY;
+            CordArray[i+1]=newCordArray[i+1]+padding;
         }
         if(rot == 0){
             incrementRot();
         }else{
             decrementRot();
         }
-            findBlockCords(rows,cols,array,CordArray);
 }
 void rotateRight(int rows, int cols ,int **array,int *CordArray,int blockNum){
         int padY=0;
@@ -553,13 +533,11 @@ int advanceState(int rows, int cols ,int **array,int *CordArray){
         return block;
     }
     }
-   findBlockCords(rows,cols,array,CordArray);
            for(int i=6; i+1>0;i-=2){
             array[CordArray[i]+1][CordArray[i+1]]=1;
             array[CordArray[i]][CordArray[i+1]]=0;
+            CordArray[i]=CordArray[i]+1;
         }
-
-                findBlockCords(rows,cols,array,CordArray);
                 return 0;
 }
 
@@ -761,6 +739,15 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[0][rows/2+1]=1;
     array[1][rows/2] = 1;
     array[1][rows/2+1]=1;
+
+    CordArray[0]=0;
+    CordArray[1]=rows/2;
+    CordArray[2]=0;
+    CordArray[3]=rows/2+1;
+    CordArray[4]=1;
+    CordArray[5]=rows/2;
+    CordArray[6]=1;
+    CordArray[7]=rows/2+1;
         break;
         case line://line
     if(checkFlag == 1){
@@ -777,7 +764,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[0][rows/2]=1;
     array[0][rows/2+1] = 1;
     array[0][rows/2+2]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2-1;
+    CordArray[2]=0;
+    CordArray[3]=rows/2;
+    CordArray[4]=0;
+    CordArray[5]=rows/2+1;
+    CordArray[6]=0;
+    CordArray[7]=rows/2+2;
         break;
             case Z://z
     if(checkFlag == 1){
@@ -794,7 +788,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[0][rows/2]=1;
     array[1][rows/2] = 1;
     array[1][rows/2+1]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2-1;
+    CordArray[2]=0;
+    CordArray[3]=rows/2;
+    CordArray[4]=1;
+    CordArray[5]=rows/2;
+    CordArray[6]=1;
+    CordArray[7]=rows/2+1;
         break;
             case S://s
     if(checkFlag == 1){
@@ -811,7 +812,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[0][rows/2+1]=1;
     array[1][rows/2] = 1;
     array[1][rows/2-1]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2;
+    CordArray[2]=0;
+    CordArray[3]=rows/2+1;
+    CordArray[4]=1;
+    CordArray[5]=rows/2;
+    CordArray[6]=1;
+    CordArray[7]=rows/2-1;
         break;
             case L://L
     if(checkFlag == 1){
@@ -828,7 +836,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[1][rows/2-1] = 1;
     array[1][rows/2] = 1;
     array[1][rows/2+1]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2-1;
+    CordArray[2]=1;
+    CordArray[3]=rows/2-1;
+    CordArray[4]=1;
+    CordArray[5]=rows/2;
+    CordArray[6]=1;
+    CordArray[7]=rows/2+1;
         break;
             case J://j
     if(checkFlag == 1){
@@ -845,7 +860,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[1][rows/2+1] = 1;
     array[1][rows/2] = 1;
     array[1][rows/2-1]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2+1;
+    CordArray[2]=1;
+    CordArray[3]=rows/2+1;
+    CordArray[4]=1;
+    CordArray[5]=rows/2;
+    CordArray[6]=1;
+    CordArray[7]=rows/2-1;
         break;
             case T://T
     if(checkFlag == 1){
@@ -862,7 +884,14 @@ int spawnBlock(int rows, int cols ,int **array,int *CordArray,int num){
     array[1][rows/2]=1;
     array[1][rows/2-1] = 1;
     array[1][rows/2+1]=1;
-
+    CordArray[0]=0;
+    CordArray[1]=rows/2;
+    CordArray[2]=1;
+    CordArray[3]=rows/2;
+    CordArray[4]=1;
+    CordArray[5]=rows/2-1;
+    CordArray[6]=1;
+    CordArray[7]=rows/2+1;
         break;
     default:
     printf("rNum is broken %d",rNum);
